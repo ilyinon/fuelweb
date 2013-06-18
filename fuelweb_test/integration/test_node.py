@@ -142,5 +142,22 @@ class TestNode(BaseNodeTestCase):
             for mac in mac_addresses:
                 Ebtables.restore_mac(mac)
 
+    @snapshot_errors
+    @logwrap
+    @fetch_logs
+    def test_add_compute_node(self):
+        cluster_name = 'node_addition'
+        nodes_dict = {'controller': self.nodes().slaves[:1],
+                      'compute': self.nodes().slaves[1:2]}
+        additional_nodes = self.nodes().slaves[2:3]
+        additional_nodes_dict = {'compute': additional_nodes}
+        cluster_id = self._basic_provisioning(
+            cluster_name=cluster_name, nodes_dict=nodes_dict)
+        self.bootstrap_nodes(additional_nodes_dict)
+        self.add_node(nodes_dict)
+        self.assertEqual(3, len(self.client.list_cluster_nodes(cluster_id)))
+        task = self.client.update_cluster_changes(cluster_id)
+        self.assertTaskSuccess(task)
+
 if __name__ == '__main__':
     unittest.main()

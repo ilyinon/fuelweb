@@ -60,7 +60,7 @@ class BaseNodeTestCase(BaseTestCase):
     def delete_node(self, cluster_id, devops_node):
         nailgun_node = self.get_node_by_devops_node(devops_node)
         self.client.update_node(nailgun_node['id'], {'pending_deletion': True})
-        task = self._launch_provisioning(cluster_id)
+        task = self.client.update_cluster_changes(cluster_id)
         self.assertTaskSuccess(task)
         return nailgun_node
 
@@ -98,6 +98,12 @@ class BaseNodeTestCase(BaseTestCase):
             self.assertTrue(remote.isfile('/tmp/%s-file' % role))
 
     @logwrap
+    def add_node(self, nodes_dict):
+        for node, role in self.get_nailgun_node_roles(nodes_dict):
+            self.client.update_node(
+                node['id'], {"role": role, "pending_addition": True})
+
+    @logwrap
     def _basic_provisioning(self, cluster_name, nodes_dict, port=5514):
         self.client.clean_clusters()
         cluster_id = self.create_cluster(name=cluster_name)
@@ -117,12 +123,10 @@ class BaseNodeTestCase(BaseTestCase):
 
         nodes = self.bootstrap_nodes(self.devops_nodes_by_names(node_names))
 
-        for node, role in self.get_nailgun_node_roles(nodes_dict):
-            self.client.update_node(
-                node['id'], {"role": role, "pending_addition": True})
+        self.add_node(nodes_dict)
 
         self.update_nodes_in_cluster(cluster_id, nodes)
-        task = self._launch_provisioning(cluster_id)
+        task = self.client.update_cluster_changes(cluster_id)
         self.assertTaskSuccess(task)
         self.check_role_file(nodes_dict)
         return cluster_id
@@ -136,11 +140,6 @@ class BaseNodeTestCase(BaseTestCase):
                 node = self.get_node_by_devops_node(slave)
                 nailgun_node_roles.append((node, role))
         return nailgun_node_roles
-
-    @logwrap
-    def _launch_provisioning(self, cluster_id):
-        """Return hash with task description."""
-        return self.client.update_cluster_changes(cluster_id)
 
     @logwrap
     def assertTaskSuccess(self, task, timeout=90 * 60):
