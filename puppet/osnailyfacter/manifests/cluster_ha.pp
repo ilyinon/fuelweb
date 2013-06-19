@@ -229,6 +229,7 @@ class compact_controller {
         tenant_network_type    => $tenant_network_type,
         segment_range          => $segment_range,
         use_syslog             => true,
+        state_path             => $nova_hash[state_path],
       }
 
       class { "::rsyslog::client":

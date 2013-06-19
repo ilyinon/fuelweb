@@ -142,7 +142,7 @@ class VolumeManager(object):
         for i, vg in enumerate(self.volumes):
             if vg.get("type") == "vg" and vg.get("id") == "vm":
                 for j, lv in enumerate(vg.get("volumes", [])):
-                    if lv.get("type") == "lv" and lv.get("name") == "libvirt":
+                    if lv.get("type") == "lv" and lv.get("name") == "nova":
                         self.volumes[i]["volumes"][j]["size"] = \
                             self.field_generator("calc_total_vg", "vm")
             if vg.get("type") == "vg" and vg.get("id") == "os":
