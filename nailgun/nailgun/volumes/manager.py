@@ -157,7 +157,7 @@ class VolumeManager(object):
         new_dict = {}
         if isinstance(cdict, dict):
             for i, val in cdict.iteritems():
-                if type(val) in (str, unicode, int, float):
+                if isinstance(val, (str, unicode, int, float)):
                     new_dict[i] = val
                 elif isinstance(val, dict):
                     if "generator" in val:
