@@ -50,7 +50,7 @@ function(models, commonViews, ClusterPage, NodesTab, ClustersPage, ReleasesPage,
             this.navigate('#cluster/' + id + '/nodes', {trigger: true, replace: true});
         },
         showClusterTab: function(id, activeTab) {
-            if (!_.contains(ClusterPage.prototype.tabs, activeTab)) {
+            if (!_.contains(_.result(ClusterPage.prototype, 'tabs'), activeTab)) {
                 this.showCluster(id);
                 return;
             }
